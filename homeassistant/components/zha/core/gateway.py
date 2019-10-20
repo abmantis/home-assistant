@@ -126,7 +126,6 @@ class ZHAGateway:
             self.application_controller.ieee
         )
 
-        init_tasks = []
         semaphore = asyncio.Semaphore(2)
 
         async def init_with_semaphore(coro, semaphore):
@@ -137,10 +136,9 @@ class ZHAGateway:
         for device in self.application_controller.devices.values():
             if device.nwk == 0x0000:
                 continue
-            init_tasks.append(
+            await asyncio.create_task(
                 init_with_semaphore(self.async_device_restored(device), semaphore)
             )
-        await asyncio.gather(*init_tasks)
 
     def device_joined(self, device):
         """Handle device joined.
